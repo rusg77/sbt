@@ -1,0 +1,5 @@
+%h1= "Test Unit: #{@report['test_unit']}"
+- @report['tests'].each do |test_name, test_data|
+  %h2= "Test name: #{test_name}"
+  -test_data['screenshots'].each do |screenshot|
+    %img{ :src => "/screenshots/#{screenshot}", :id => "#{screenshot}" }
