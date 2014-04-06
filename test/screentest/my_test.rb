@@ -2,7 +2,7 @@ require_relative 'test_unit'
 require 'selenium-webdriver'
 
 
-class MyTest < TestUnitMongoReport
+class MyTest < TestUnit::TestUnitMongoReport
 
   def setup
     @driver = Selenium::WebDriver.for :firefox
@@ -23,3 +23,5 @@ class MyTest < TestUnitMongoReport
   end
 
 end
+
+MyTest.new.execute_tests

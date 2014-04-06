@@ -3,4 +3,5 @@ host: 'localhost'
 port: 27017
 db_name: 'sbt'
 reports_coll: 'reports'
+results_coll: 'results'
 

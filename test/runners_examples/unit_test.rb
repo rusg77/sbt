@@ -23,3 +23,4 @@ class UnitTest < Test::Unit::TestCase
   end
 
 end
+

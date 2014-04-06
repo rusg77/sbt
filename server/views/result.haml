@@ -1,0 +1,14 @@
+%h1= "Test Unit: #{@result['test_unit']}"
+- @result['tests'].each do |test_name, test_data|
+  %h2= "Test name: #{test_name}"
+  .pure-g-r
+    -test_data['screenshots'].each do |screenshot_group|
+      .pure-u-1-2
+        .border_left
+          %img{ :src => "/screenshot/#{screenshot_group[0]}", :id => "#{screenshot_group[0]}" }
+      .pure-u-1-2
+        .border_right
+          %img{ :src => "/screenshot/#{screenshot_group[1]}", :id => "#{screenshot_group[1]}" }
+      .pure-u-1
+        .border_center
+          %img{ :src => "/screenshot/#{screenshot_group[2]}", :id => "#{screenshot_group[2]}" }

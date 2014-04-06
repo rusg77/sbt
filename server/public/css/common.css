@@ -3,3 +3,24 @@
     padding: 0;
     background-color: white;
 }
+
+h1 {
+    color: #1F8DD6;
+    font-size: 400%;
+    text-align: center;
+}
+
+.border_left {
+    border-top: solid 1px #1F8DD6;
+    border-right: solid 1px #1F8DD6;
+    border-left: solid 1px #1F8DD6;
+}
+
+.border_right {
+    border-top: solid 1px #1F8DD6;
+    border-right: solid 1px #1F8DD6;
+}
+
+.border_center {
+    border: solid 1px #1F8DD6;
+}
