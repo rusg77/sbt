@@ -1,6 +1,6 @@
 require 'chunky_png'
 
-module MyChunky
+module ChunkyCompare
 
   # фукнкция для сравнения двух изображений
   # @param [String] img1 путь к первому изображению
@@ -31,5 +31,3 @@ module MyChunky
     diff.save('diff.png')
   end
 end
-
-# MyChunky::get_diff('100.png', '2.png')

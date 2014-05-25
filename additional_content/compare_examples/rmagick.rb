@@ -1,6 +1,6 @@
 require 'RMagick'
 
-module Compare
+module RmagickCompare
 
   # фукнкция для сравнения двух изображений
   # @param [String] img1 путь к первому изображению
@@ -8,11 +8,11 @@ module Compare
   # @return [String] результирующее изображение
   def self.compare(img1, img2)
     # загружаем в память первое изображение
-    img1 =  Magick::Image::from_blob(img1).first
+    img1 =  Magick::Image::read(img1).first
     # загружаем в память второе изображение
-    img2 =  Magick::Image::from_blob(img2).first
+    img2 =  Magick::Image::read(img2).first
     # получаем результирующее изображение с помощью метода compare_channel
-    img1.compare_channel(img2, Magick::MeanAbsoluteErrorMetric)[0].to_blob
+    img1.compare_channel(img2, Magick::MeanAbsoluteErrorMetric)[0].write 'diff.png'
   end
 
 
@@ -40,10 +40,7 @@ module Compare
       end
     end
     img_diff = Magick::Image.new(img1.columns, img1.rows)
-    return img_diff.store_pixels(0, 0, img1.columns, img1.rows, diff), diff_pixels.to_f/(img1.columns*img1.rows)*100
+    img_diff.store_pixels(0, 0, img1.columns, img1.rows, diff).write 'diff.png'
+    diff_pixels.to_f/(img1.columns*img1.rows)*100
   end
 end
-
-
-
-Compare.get_diff('1.png', '2.png')

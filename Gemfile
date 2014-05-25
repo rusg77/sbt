@@ -1,5 +1,3 @@
-source 'https://rubygems.org'
-
 gem 'rake'
 gem 'sinatra'
 gem 'resque', path: '../../'
@@ -9,3 +7,4 @@ gem 'rmagick'
 gem 'haml'
 gem 'thin'
 gem 'selenium-webdriver'
+gem 'chunky_png'
