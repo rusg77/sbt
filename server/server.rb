@@ -141,10 +141,14 @@ end
 
 get '/execute' do
   # TODO: проверки параметров
-  report = JSON.parse(params[:config])
+  config = JSON.parse(params[:config])
+  report = config.clone
+  report.delete('all_tests')
   report['start_time'] = Time.now.to_i
   report['status'] = 'progress'
-  puts report
+  report_id = settings.mongo.add_report(report).to_s
+  config['report_id'] = report_id
+  Resque.enqueue(Execute, config)
 end
 
 

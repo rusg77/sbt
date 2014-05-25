@@ -3,7 +3,7 @@ require 'selenium-webdriver'
 
 
 
-class Login < ScreenTest::MongoUnit
+class Login < ScreenTest::Unit
 
   def setup
     @driver.get 'https://e.mail.ru/login'

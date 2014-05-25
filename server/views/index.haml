@@ -8,10 +8,13 @@
             %img{:class => 'email-avatar', :src => "/image/#{report['browser']}.png", :width => 64, :height => 64, :alt => "#{report['browser']}"}
           %div{:class => 'pure-u-3-4'}
             %p.email-desc="Автор: #{report['author']}"
-            %p.email-desc="Разрешение: #{report['resolution']['width']}x#{report['resolution']['height']}"
-            %p.email-desc="Продолжительность: #{report['end_time'] -report['start_time']} сек"
-            %p.email-desc="Ошибок: #{report['failed']}"
-            %a{:href => "/report/view/#{report['_id']}"} Подробнее
+            %p.email-desc="Разрешение: #{report['width']}x#{report['height']}"
+            -if report['status'] == 'done'
+              %p.email-desc="Продолжительность: #{report['end_time'] -report['start_time']} сек"
+              %p.email-desc="Ошибок: #{report['failed']}"
+              %a{:href => "/report/view/#{report['_id']}"} Подробнее
+            -else
+              %p.email-desc="Статус: в обработке"
   .pure-u-1-2
     %h2.content-subhead Последние результаты
     #list.pure-u-1
@@ -21,10 +24,9 @@
             %img{:class => 'email-avatar', :src => "/image/#{result['browser']}.png", :width => 64, :height => 64, :alt => "#{result['browser']}"}
           %div{:class => 'pure-u-3-4'}
             %p.email-desc="Автор: #{result['author']}"
-            %p.email-desc="Разрешение: #{result['resolution']['width']}x#{result['resolution']['height']}"
+            %p.email-desc="Разрешение: #{result['width']}x#{result['height']}"
             -if result['status'] == 'progress'
               %p.email-desc="Статус: в обработке"
             -else
               %p.email-desc="Продолжительность: #{result['end_time'] -result['start_time']} сек"
               %a{:href => "/result/view/#{result['_id']}"} Подробнее
-

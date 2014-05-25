@@ -1,5 +1,7 @@
 require 'rmagick'
 require_relative '../db/db'
+require_relative '../tests/messages'
+require_relative '../tests/login'
 
 module Analyse
   @queue = :analyse
@@ -84,5 +86,53 @@ module Analyse
     result['status'] = 'done'
     db.update_result(result_id, result)
   end
+end
+
+
+module Execute
+  @queue = :execute
+
+  def self.perform(params)
+    db = Mongo::MongoDB.new
+    puts params
+
+    test_units_count = params['all_tests'].length
+    report = Hash.new{|h,k| h[k] = Hash.new(&h.default_proc)}
+    threads = (0..test_units_count-1).map do |i|
+      Thread.new {
+        report['test_units'][params['all_tests'].keys[i]] =
+            Object.const_get(params['all_tests'].keys[i]).new(url=params['url'],
+                                                              platform=params['platform'],
+                                                              browser=params['browser'],
+                                                              width=params['width'],
+                                                              height=params['height'],
+                                                              java_script=params['java_script'],
+                                                              params['all_tests'].values[i]).execute_tests
+      }
+    end
+    threads.each {|t| t.join}
+    # other static
+    units_failed = 0
+    report['test_units'].each do |unit_name, unit_data|
+      passed = 0
+      unit_data['tests'].each do |test_name, test_data|
+        if test_data['status'] == 'done'
+          passed +=1
+        end
+      end
+      unit_data['passed'] = passed
+      unit_data['failed'] = unit_data['total'] - passed
+      if unit_data['failed'] != 0
+        units_failed +=1
+      end
+    end
+    report['total'] = report['test_units'].length
+    report['failed'] = units_failed
+    report['passed'] = report['total'] - units_failed
+    report['status'] = 'done'
+    report['end_time'] = Time.now.to_i
+    db.update_report(params['report_id'], report)
+  end
 
 end
+

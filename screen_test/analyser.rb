@@ -13,9 +13,9 @@ module Analyser
       result = Hash.new{|h,k| h[k] = Hash.new(&h.default_proc)}
       result['id1'], result['id2'] = @id1, @id2
       result['errors'] = []
-      if report1['resolution'] != report2['resolution']
-        result['errors'] << 'Разрешение отчетов не совпадает'
-      end
+      # if report1['resolution'] != report2['resolution']
+      #   result['errors'] << 'Разрешение отчетов не совпадает'
+      # end
       if report1['browser'] != report2['browser']
         result['errors'] << 'Браузеры отчетов не совпадают'
       end

@@ -1,5 +1,5 @@
 %p.email-desc="Автор: #{@result['author']}"
-%p.email-desc="Разрешение: #{@result['resolution']['width']}x#{@result['resolution']['height']}"
+%p.email-desc="Разрешение: #{@result['width']}x#{@result['height']}"
 %p.email-desc="Продолжительность: #{@result['end_time'] - @result['start_time']} сек"
 %ul{:id => "accordion", :class => "nav"}
   - @result['test_units'].each do |unit_name, unit_data|

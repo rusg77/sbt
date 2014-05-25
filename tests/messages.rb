@@ -3,7 +3,7 @@ require 'selenium-webdriver'
 
 
 
-class Messages < ScreenTest::MongoUnit
+class Messages < ScreenTest::Unit
 
   def read_message_test
     @driver.get 'https://e.mail.ru/login'

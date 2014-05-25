@@ -26,6 +26,7 @@ module Mongo
     def get_report(id) @reports.find_one(:_id => _id(id)); end
     def get_reports; @reports.find.sort(:start_time => :desc); end
     def remove_report(id) @reports.remove(:_id => _id(id)); end
+    def update_report(id, report) @reports.update({:_id => _id(id)}, { "$set" => report}); end
 
     # result's methods
     def add_result(result) @results.insert(result); end

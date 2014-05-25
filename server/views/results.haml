@@ -6,7 +6,7 @@
         %img{:class => 'email-avatar', :src => "/image/#{result['browser']}.png", :width => 64, :height => 64, :alt => "#{result['browser']}"}
       %div{:class => 'pure-u-3-4'}
         %p.email-desc="Автор: #{result['author']}"
-        %p.email-desc="Разрешение: #{result['resolution']['width']}x#{result['resolution']['height']}"
+        %p.email-desc="Разрешение: #{result['width']}x#{result['height']}"
         -if result['status'] == 'progress'
           %p.email-desc="Статус: в обработке"
         -else

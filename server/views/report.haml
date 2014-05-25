@@ -1,5 +1,5 @@
 %p.email-desc="Автор: #{@report['author']}"
-%p.email-desc="Разрешение: #{@report['resolution']['width']}x#{@report['resolution']['height']}"
+%p.email-desc="Разрешение: #{@report['width']}x#{@report['height']}"
 %p.email-desc="Продолжительность: #{@report['end_time'] - @report['start_time']} сек"
 %p.email-desc="Ошибок: #{@report['failed']}"
 %ul{:id => "accordion", :class => "nav"}
