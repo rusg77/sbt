@@ -1,17 +1,38 @@
 !!!
 %html
   %head
-    %title Screenshot Base Testing
-    %link(rel="stylesheet" href="/css/common.css")
+    %title Система автоматизированного регрессинного тестирования
+
     %link(rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.2/pure-min.css")
+    %link(rel="stylesheet" href="/css/common.css")
+    %link(rel="stylesheet" href="/css/jquery.navgoco.css" media="screen" )
+
+    %script{:type => "text/javascript", src:"http://code.jquery.com/jquery-1.10.2.min.js"}
+    %script{:type => "text/javascript", src:"/js/jquery.navgoco.min.js"}
+    -#%script{:type => "text/javascript", src:"/js/jquery.cookie.min.js"}
+    %script{:type => "text/javascript", src:"/js/js.js"}
+
+
 
   %body
-    .pure-g-r
-      .pure-u-1
-        %h1= "Screenshot Base Testing"
-      .pure-u-1-8
-        %p= 'left'
-      .pure-u-3-4
-        =yield
-      .pure-u-1-8
-        %p= 'right'
+    #layout
+      %a{:href => '#', :id => 'menuLink', :class => 'menu-link'}
+      #menu
+        %div.pure-menu.pure-menu-open
+          %ul
+            %a{:href => '/', :class => 'pure-menu-heading'} Меню
+            %li
+              %a{:href => '/reports/view'} Отчеты
+            %li
+              %a{:href => '/results/view'} Результаты
+            %li
+              %a{:href => '/run'} Запустить
+            %li
+              %a{:href => '/analyse'} Анализировать
+            %li
+              %a{:href => '/about'} Справка
+      #main
+        .header
+          %h1= 'Система автоматизированного регрессинного тестирования'
+        .content
+          =yield

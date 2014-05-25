@@ -19,17 +19,20 @@ module Mongo
 
     # screenshots methods
     def add_screenshot(screenshot) @grid.put(screenshot); end
-    def get_screenshot(id)@grid.get(_id(id)); end
+    def get_screenshot(id) @grid.get(_id(id)); end
 
-    # report methods
+    # report's methods
     def add_report(report) @reports.insert(report); end
     def get_report(id) @reports.find_one(:_id => _id(id)); end
-    def get_reports; @reports.find; end
+    def get_reports; @reports.find.sort(:start_time => :desc); end
     def remove_report(id) @reports.remove(:_id => _id(id)); end
 
-    # results methods
+    # result's methods
     def add_result(result) @results.insert(result); end
     def get_result(id) @results.find_one(:_id => _id(id)); end
+    def get_results; @results.find.sort(:start_time => :desc); end
+    def remove_result(id) @results.remove(:_id => _id(id)); end
+    def update_result(id, result) @results.update({:_id => _id(id)}, { "$set" => result}); end
 
   end
 

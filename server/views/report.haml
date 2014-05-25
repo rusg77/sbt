@@ -1,5 +1,32 @@
-%h1= "Test Unit: #{@report['test_unit']}"
-- @report['tests'].each do |test_name, test_data|
-  %h2= "Test name: #{test_name}"
-  -test_data['screenshots'].each do |screenshot|
-    %img{ :src => "/screenshot/#{screenshot}", :id => "#{screenshot}" }
+%p.email-desc="Автор: #{@report['author']}"
+%p.email-desc="Разрешение: #{@report['resolution']['width']}x#{@report['resolution']['height']}"
+%p.email-desc="Продолжительность: #{@report['end_time'] - @report['start_time']} сек"
+%p.email-desc="Ошибок: #{@report['failed']}"
+%ul{:id => "accordion", :class => "nav"}
+  - @report['test_units'].each do |unit_name, unit_data|
+    %li
+      -if unit_data['failed']==0
+        %a{:href => '#', :class => "done"} #{unit_name}
+      -else
+        %a{:href => '#', :class => "fail"} #{unit_name}
+      %ul
+        - unit_data['tests'].each do |test_name, test_data|
+          %li
+            -if test_data['status'] == 'fail'
+              %a{:href => '#', :class => "#{test_data['status']}"} #{test_name}: #{test_data['error']}
+            -else
+              %a{:href => '#', :class => "#{test_data['status']}"} #{test_name}
+            -if test_data['screenshots'].length > 0
+              %ul
+                -test_data['screenshots'].each_with_index do |screenshot, index|
+                  %li
+                    %a{:href => "#"} Screenshot #{index}: #{screenshot}
+                    %ul
+                      -#%a{:href => "/screenshot/#{screenshot}"}
+                      %li
+                        %img{ :src => "/screenshot/#{screenshot}", :id => "#{screenshot}", :style => "max-width: 100%" }
+            -else
+              %ul
+                %li
+                  %a{:href => "#"} Скриншоты отсутствуют
+

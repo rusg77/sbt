@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gem 'rake'
+gem 'sinatra'
+gem 'resque', path: '../../'
+gem 'mongo'
+gem 'bson_ext'
+gem 'rmagick'
+gem 'haml'
+gem 'thin'

@@ -1,9 +1,14 @@
 require_relative '../db/db'
-require_relative '../compare/rmagic'
 require 'sinatra'
 require 'haml'
 require 'json/ext'
-require 'mongo/exceptions'
+require 'mongo/exception'
+require 'resque'
+require 'redis'
+require_relative '../queue/jobs'
+require_relative '../screen_test/analyser'
+
+Resque.redis = Redis.new
 
 configure do
   set :mongo, Mongo::MongoDB.new
@@ -14,7 +19,13 @@ helpers do
 
 end
 
+get '/resque' do
+  @info = Resque.info.to_json
+end
+
 get '/' do
+  @reports = settings.mongo.get_reports
+  @results = settings.mongo.get_results
   haml :index
 end
 
@@ -29,10 +40,9 @@ get '/screenshot/:id' do |id|
     content_type :json
     {:status => 'not_exists'}.to_json
   end
-
 end
 
-get '/reports' do
+get '/reports/json' do
   content_type :json
   settings.mongo.get_reports.to_a.to_json
 end
@@ -62,6 +72,34 @@ get '/report/remove/:id' do |id|
   end
 end
 
+get '/reports/view' do
+  begin
+    @reports = settings.mongo.get_reports
+    if @reports
+      haml :reports
+    else
+      content_type :json
+      {:status => 'not_exists'}.to_json
+    end
+  end
+end
+
+get '/result/remove/:id' do |id|
+  content_type :json
+  begin
+    settings.mongo.remove_result(id)
+    {:status => 'success or not_exists'}.to_json
+  rescue BSON::InvalidObjectId
+    {:status => 'invalid_id'}.to_json
+  end
+end
+
+get '/results/json' do
+  content_type :json
+  settings.mongo.get_results.to_a.to_json
+end
+
+
 get '/result/view/:id' do |id|
   begin
     @result = settings.mongo.get_result(id)
@@ -77,29 +115,63 @@ get '/result/view/:id' do |id|
   end
 end
 
-get '/compare' do
-  # TODO: тут нужны многочисленные проверки
-  id1, id2 = params[:id1], params[:id2]
-  report1, report2 = settings.mongo.get_report(id1), settings.mongo.get_report(id2)
-  result = Hash.new{|h,k| h[k] = Hash.new(&h.default_proc)}
-  result['id1'], result['id2'] = id1, id2
-  result['test_unit'] = report1['test_unit']
-
-  report1['tests'].each do |test_name, test_data|
-    result['tests'][test_name]['screenshots'] = []
-    test_data['screenshots'].each_with_index do |screenshot1, index|
-      screenshot2 = report2['tests'][test_name]['screenshots'][index]
-      screenshots_data = []
-      screenshots_data << screenshot1
-      screenshots_data << screenshot2
-      screenshot1 = settings.mongo.get_screenshot(screenshot1).read
-      screenshot2 = settings.mongo.get_screenshot(screenshot2).read
-      compare_result  = Compare::compare(screenshot1, screenshot2)
-      screenshots_data << settings.mongo.add_screenshot(compare_result).to_s
-      result['tests'][test_name]['screenshots'] << screenshots_data
+get '/results/view' do
+  begin
+    @results = settings.mongo.get_results
+    if @results
+      haml :results
+    else
+      content_type :json
+      {:status => 'not_exists'}.to_json
     end
   end
+end
+
+
+get '/analyse' do
+  id1, id2 = params[:id1], params[:id2]
+  params = Analyser::Analyser.new(id1, id2).analyze
+  if params['result']['errors'].length == 0
+    Resque.enqueue(Analyse, params)
+  end
   content_type :json
-  result['_id'] = settings.mongo.add_result(result)
+  params['result'].to_json
+end
+
+
+get '/execute' do
+  # TODO: проверки параметров
+  report = JSON.parse(params[:config])
+  report['start_time'] = Time.now.to_i
+  report['status'] = 'progress'
+  puts report
+end
+
+
+get '/units' do
+  # TODO: переделать все
+  result = Hash.new{|h,k| h[k] = Hash.new(&h.default_proc)}
+  files = Dir.entries('../tests') - %w(. ..)
+  files.each do |file_name|
+    file_content = File.read("../tests/#{file_name}")
+    # TODO: не хватать def, чтобы его потом не удалять
+    tests = file_content.scan(/def\s\S+_test/)
+    tests.each { |test| test.slice! 'def '}
+    result[file_name] = tests
+  end
+  content_type :json
   result.to_json
 end
+
+
+
+
+
+
+
+
+
+
+
+
+

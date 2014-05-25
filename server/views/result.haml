@@ -1,14 +1,41 @@
-%h1= "Test Unit: #{@result['test_unit']}"
-- @result['tests'].each do |test_name, test_data|
-  %h2= "Test name: #{test_name}"
-  .pure-g-r
-    -test_data['screenshots'].each do |screenshot_group|
-      .pure-u-1-2
-        .border_left
-          %img{ :src => "/screenshot/#{screenshot_group[0]}", :id => "#{screenshot_group[0]}" }
-      .pure-u-1-2
-        .border_right
-          %img{ :src => "/screenshot/#{screenshot_group[1]}", :id => "#{screenshot_group[1]}" }
-      .pure-u-1
-        .border_center
-          %img{ :src => "/screenshot/#{screenshot_group[2]}", :id => "#{screenshot_group[2]}" }
+%p.email-desc="Автор: #{@result['author']}"
+%p.email-desc="Разрешение: #{@result['resolution']['width']}x#{@result['resolution']['height']}"
+%p.email-desc="Продолжительность: #{@result['end_time'] - @result['start_time']} сек"
+%ul{:id => "accordion", :class => "nav"}
+  - @result['test_units'].each do |unit_name, unit_data|
+    %li
+      -if unit_data['status'] == 'done'
+        %a{:href => '#', :class => "done"} #{unit_name}
+      -else
+        %a{:href => '#', :class => "fail"} #{unit_name}
+      %ul
+        - unit_data['tests'].each do |test_name, test_data|
+          %li
+            -if test_data['screenshot_length'] == 'fail' or test_data['screenshots_non_zero'] == 'fail'
+              %a{:href => '#', :class => "fail"} #{test_name}
+              %ul
+                %li
+                  -if test_data['screenshot_length'] == 'fail'
+                    %a{:href => "#"} Что-то пошло не так, количество скриншотов не совпадает
+                  -if test_data['screenshots_non_zero']
+                    %a{:href => "#"} Скриншоты отсутствуют
+            -else
+              %a{:href => '#', :class => "done"} #{test_name}
+              %ul
+                -test_data['screenshots'].each_with_index do |screenshots_group, index|
+                  %li
+                    %a{:href => '#'} Группа #{index+1}
+                    %ul
+                      %li
+                        %a{:href => '#'} Результат: #{100-screenshots_group[3]}
+                        %ul
+                          %li
+                          %img{ :src => "/screenshot/#{screenshots_group[2]}", :id => "#{screenshots_group[2]}", :style => "max-width: 100%" }
+                        %a{:href => '#'} Скриншот 1
+                        %ul
+                          %li
+                          %img{ :src => "/screenshot/#{screenshots_group[0]}", :id => "#{screenshots_group[0]}", :style => "max-width: 100%" }
+                        %a{:href => '#'} Скриншот 2
+                        %ul
+                          %li
+                          %img{ :src => "/screenshot/#{screenshots_group[1]}", :id => "#{screenshots_group[1]}", :style => "max-width: 100%" }
