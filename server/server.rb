@@ -6,7 +6,6 @@ require 'mongo/exception'
 require 'resque'
 require 'redis'
 require_relative '../queue/jobs'
-require_relative '../screen_test/analyser'
 
 Resque.redis = Redis.new
 
@@ -130,12 +129,46 @@ end
 
 get '/analyse' do
   id1, id2 = params[:id1], params[:id2]
-  params = Analyser::Analyser.new(id1, id2).analyze
-  if params['result']['errors'].length == 0
-    Resque.enqueue(Analyse, params)
-  end
   content_type :json
-  params['result'].to_json
+  begin
+    report1, report2 = settings.mongo.get_report(id1), settings.mongo.get_report(id2)
+    if report1 != nil and report2 != nil
+      errors = []
+      if report1['width'] != report2['width'] or report1['height'] != report2['height']
+        errors << 'Разрешение отчетов не совпадает'
+      end
+      # if report1['browser'] != report2['browser']
+      #   errors << 'Браузеры отчетов не совпадают'
+      # end
+      if report1['platform'] != report2['platform']
+        errors << 'ОС отчетов не совпадают'
+      end
+      # если ошибки не найдены
+      if errors.length == 0
+        result = Hash.new{|h,k| h[k] = Hash.new(&h.default_proc)}
+        result['id1'], result['id2'] = id1, id2
+        %w(browser platform width height).each do |key|
+          result[key] = report1[key]
+        end
+        result['author'], result['start_time'], result['status']= 'Руслан Гусейнов', Time.now.to_i, 'progress'
+        result_id = settings.mongo.add_result(result)
+        params = Hash.new
+        params['result_id'] = result_id.to_s
+        params['report_1'] = report1
+        params['report_2'] = report2
+        params['result'] = result
+        Resque.enqueue(Analyse, params)
+        params['result'].to_json
+      else
+        content_type :json
+        {:status => 'invalid_id'}.to_json
+      end
+    else
+      {:status => 'not_exists'}.to_json
+    end
+  rescue BSON::InvalidObjectId
+    {:status => 'invalid_id'}.to_json
+  end
 end
 
 
@@ -149,6 +182,8 @@ get '/execute' do
   report_id = settings.mongo.add_report(report).to_s
   config['report_id'] = report_id
   Resque.enqueue(Execute, config)
+  content_type :json
+  report.to_json
 end
 
 
@@ -166,16 +201,3 @@ get '/units' do
   content_type :json
   result.to_json
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
